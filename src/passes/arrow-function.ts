@@ -4,6 +4,8 @@ export default ({ types: t }: typeof babel): PluginObj => ({
   name: "ArrowFunction",
   visitor: {
     FunctionExpression(path) {
+      if (path.node.generator) return;
+
       let hasThis = false;
       path.traverse({
         ThisExpression(innerPath) {
