@@ -1,9 +1,11 @@
 import { parseAsync, transformFromAstAsync } from "@babel/core";
-import { format } from "prettier";
+import { format, Options } from "prettier";
 import chalk from "chalk";
 import * as passes from "./passes/index";
 
 type PassOptions = {
+  prettier?: Options;
+} & {
   [key in keyof typeof passes]?: boolean;
 };
 
@@ -18,7 +20,7 @@ export const defaultOptions: PassOptions = {
   splitVariableDeclarator: true,
 };
 
-export async function convert(src: string, options: PassOptions) {
+export async function convert(src: string, { prettier, ...options }: PassOptions) {
   const plugins = Object.entries(passes)
     .filter(([name]) => (options as any)[name])
     .map(([, value]) => value);
@@ -41,6 +43,7 @@ export async function convert(src: string, options: PassOptions) {
     plugins: plugins.concat(() => ({
       visitor: {
         NumericLiteral({ node }) {
+          // prettier bug
           node.extra ??= { raw: String(node.value) };
         },
       },
@@ -56,6 +59,7 @@ export async function convert(src: string, options: PassOptions) {
     printWidth: 90,
     singleQuote: false,
     trailingComma: "es5",
+    ...prettier,
   });
   return code;
 }
