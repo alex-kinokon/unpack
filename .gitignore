@@ -1,4 +1,8 @@
+# Project
 lib
+
+# GitHub
+.npmrc
 
 # Logs
 logs

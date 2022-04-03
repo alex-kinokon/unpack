@@ -15,4 +15,15 @@ const config = {
   plugins: [ts({ transpileOnly: true }), node()],
 };
 
-export default config;
+/** @type {import("rollup").RollupOptions} */
+const cli = {
+  input: "./src/cli.ts",
+  output: {
+    file: "./lib/cli.js",
+    format: "cjs",
+  },
+  external: () => true,
+  plugins: [ts({ transpileOnly: true })],
+};
+
+export default [config, cli];
