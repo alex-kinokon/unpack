@@ -1,23 +1,12 @@
-import { definePlugin } from "../utils";
+import { definePlugin, has } from "../utils";
 
 export const arrowFunction = definePlugin(({ types: t }) => ({
   FunctionExpression(path) {
     if (path.node.generator) return;
 
-    let bailOut = false;
-    path.traverse({
-      ThisExpression(innerPath) {
-        if (innerPath.getFunctionParent() === path) {
-          bailOut = true;
-          innerPath.stop();
-        }
-      },
-      Identifier(innerPath) {
-        if (innerPath.node.name === "arguments") {
-          bailOut = true;
-          innerPath.stop();
-        }
-      },
+    const bailOut = has(path, {
+      ThisExpression: innerPath => innerPath.getFunctionParent() === path,
+      Identifier: innerPath => innerPath.node.name === "arguments",
     });
 
     if (bailOut) {

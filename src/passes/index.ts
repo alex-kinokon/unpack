@@ -1,11 +1,12 @@
-export { attachToStringFunction } from "./attach-tostring-function";
 export { arrowFunction } from "./arrow-function";
-export { quotedProperties } from "./quoted-properties";
-export { yodaCondition } from "./yoda-condition";
+export { attachToStringFunction } from "./attach-tostring-function";
 export { constant } from "./constants";
 export { dangerouslyRemoveContextStripping } from "./remove-context-stripping";
 export { ensureBlock } from "./ensure-block";
+export { forToWhile } from "./for-to-while";
 export { logicalExpressionToIf } from "./logical-expression-to-if";
 export { nullishCoalescing } from "./nullish-coalescing";
+export { quotedProperties } from "./quoted-properties";
 export { splitComma } from "./split-comma";
 export { splitVariableDeclarator } from "./variable-declarators";
+export { yodaCondition } from "./yoda-condition";

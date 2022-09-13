@@ -1,6 +1,6 @@
 import { extname } from "path";
 import type * as Babel from "@babel/core";
-import type { ParserOptions, PluginObj, Visitor } from "@babel/core";
+import type { Node, NodePath, ParserOptions, PluginObj, Visitor } from "@babel/core";
 
 export function definePlugin(plugin: (babel: typeof Babel) => PluginObj | Visitor<any>) {
   let pluginName = "";
@@ -19,6 +19,30 @@ export function definePlugin(plugin: (babel: typeof Babel) => PluginObj | Visito
   };
 
   return pluginFn;
+}
+
+export function has(
+  path: Babel.NodePath,
+  visitors: {
+    [Type in Node["type"]]?: (path: NodePath<Extract<Node, { type: Type }>>) => boolean;
+  }
+) {
+  let has = false;
+  path.traverse(
+    Object.fromEntries(
+      Object.entries(visitors).map(([key, value]) => [
+        key,
+        (path: NodePath<any>) => {
+          if (value(path)) {
+            has = true;
+            path.stop();
+          }
+        },
+      ])
+    )
+  );
+
+  return has;
 }
 
 type ParserPlugin = NonNullable<ParserOptions["plugins"]>[number];
