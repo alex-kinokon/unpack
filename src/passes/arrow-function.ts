@@ -2,7 +2,7 @@ import { definePlugin, has } from "../utils";
 
 export const arrowFunction = definePlugin(({ types: t }) => ({
   FunctionExpression(path) {
-    if (path.node.generator) return;
+    if (path.node.generator || path.node.id) return;
 
     const bailOut = has(path, {
       ThisExpression: innerPath => innerPath.getFunctionParent() === path,
