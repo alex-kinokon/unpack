@@ -1,7 +1,7 @@
-import { types as t } from "@babel/core";
+import type { types as t } from "@babel/core";
 import { definePlugin } from "../utils";
 
-export const yodaCondition = definePlugin(({ types: t }) => ({
+export const yodaCondition = definePlugin(() => ({
   BinaryExpression(path) {
     const { node } = path;
     if (!["==", "===", "!=", "!=="].includes(node.operator)) {

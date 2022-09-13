@@ -1,4 +1,4 @@
-import { NodePath, types as t } from "@babel/core";
+import type { NodePath, types as t } from "@babel/core";
 import { definePlugin } from "../utils";
 
 export const nullishCoalescing = definePlugin(({ types: t }) => {

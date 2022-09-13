@@ -9,6 +9,7 @@ export const splitComma = definePlugin(({ types: t }) => ({
         break;
       case "ForStatement":
       case "IfStatement":
+      case "ThrowStatement":
       case "ReturnStatement": {
         const last = node.expressions.pop()!;
         parent.insertBefore(node.expressions.map(e => t.expressionStatement(e)));

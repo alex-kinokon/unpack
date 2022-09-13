@@ -1,11 +1,13 @@
-import { parseAsync, transformFromAstAsync } from "@babel/core";
+import * as babel from "@babel/core";
 import type { Options } from "prettier";
 import { format } from "prettier";
 import chalk from "chalk";
 import * as passes from "./passes/index";
 import { getParserPlugins } from "./utils";
 
-type PluginOptions = {
+export { definePlugin } from "./utils";
+
+type FeatureOptions = {
   [key in keyof typeof passes]?: boolean;
 };
 
@@ -13,40 +15,42 @@ Object.entries(passes).forEach(([key, value]) => {
   value.setName(key);
 });
 
-export const defaultPluginOptions: PluginOptions = {
+export const defaultPluginOptions: FeatureOptions = {
   arrowFunction: true,
+  attachToStringFunction: false,
   constant: true,
   dangerouslyRemoveContextStripping: true,
   ensureBlock: true,
+  forToWhile: true,
   logicalExpressionToIf: true,
   nullishCoalescing: true,
+  quotedProperties: true,
   splitComma: true,
   splitVariableDeclarator: true,
-  quotedProperties: true,
-  attachToStringFunction: false,
-  yodaCondition: false,
+  yodaCondition: true,
 };
+
+interface ConvertOptions {
+  features?: FeatureOptions;
+  filename: string;
+  prettier?: Options;
+  plugins?: ((Babel: typeof babel) => babel.PluginObj<babel.PluginPass>)[];
+}
 
 export async function convert(
   src: string,
-  {
-    prettier,
-    filename,
-    plugins,
-  }: {
-    plugins?: PluginOptions;
-    filename: string;
-    prettier?: Options;
-  }
+  { prettier, filename, features, plugins }: ConvertOptions
 ) {
-  plugins = { ...defaultPluginOptions, ...plugins };
+  features = { ...defaultPluginOptions, ...features };
 
-  const babelPlugins = Object.entries(passes)
-    .filter(([name]) => (plugins as any)[name])
-    .map(([, value]) => value);
+  const babelPlugins: babel.PluginItem[] = Object.entries(passes)
+    .filter(([name]) => (features as any)[name])
+    .map(([, value]) => value as babel.PluginItem)
+    .concat(plugins ?? []);
 
   console.debug(chalk`Parsing AST`);
-  const ast = await parseAsync(src, {
+
+  const ast = await babel.parseAsync(src, {
     babelrc: false,
     parserOpts: {
       plugins: getParserPlugins(filename),
@@ -54,11 +58,9 @@ export async function convert(
   });
 
   console.debug(chalk`Running {green Babel transforms}`);
-  const result = await transformFromAstAsync(ast!, src, {
+  const result = await babel.transformFromAstAsync(ast!, src, {
     ast: true,
-    generatorOpts: {
-      compact: false,
-    },
+    generatorOpts: { compact: false },
     cloneInputAst: false,
     plugins: babelPlugins,
   });
