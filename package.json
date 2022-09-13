@@ -3,24 +3,36 @@
   "version": "0.1.0",
   "main": "lib/index.js",
   "bin": "lib/cli.js",
+  "scripts": {
+    "build": "rollup -c",
+    "build:cli": "TASK_NAME=cli rollup -c"
+  },
   "dependencies": {
-    "@babel/core": "^7.17.8",
-    "@babel/preset-env": "^7.16.11",
+    "@babel/core": "^7.18.9",
+    "@babel/preset-env": "^7.18.9",
     "chalk": "^4.1.2",
-    "prettier": "^2.6.2"
+    "commander": "^9.4.0",
+    "lodash": "^4.17.21",
+    "prettier": "^2.7.1"
   },
   "files": [
     "lib"
   ],
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@babel/parser": "^7.18.9",
+    "@babel/types": "^7.18.9",
+    "@rollup/plugin-node-resolve": "^13.3.0",
     "@types/babel__core": "^7.1.19",
-    "@types/node": "^17.0.23",
-    "@types/prettier": "^2.4.4",
-    "rollup": "^2.70.1",
-    "rollup-plugin-ts": "^2.0.5",
-    "ts-node": "^10.7.0",
-    "typescript": "4.6.3"
+    "@types/lodash": "^4.14.182",
+    "@types/node": "^18.0.6",
+    "@types/prettier": "^2.6.3",
+    "rollup": "^2.77.0",
+    "rollup-plugin-ts": "^3.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "4.7.4"
+  },
+  "resolutions": {
+    "@babel/types": "7.18.9"
   },
   "prettier": {
     "arrowParens": "avoid",
