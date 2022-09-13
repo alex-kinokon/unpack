@@ -13,9 +13,11 @@ export default ({ types: t }: typeof babel): PluginObj => {
     operator = "==="
   ) =>
     t.isBinaryExpression(expression, { operator }) &&
+    // Left
     ((match(expression.left) &&
       matchOther(expression.right) &&
       (extract?.(expression.left, expression.right), true)) ||
+      // Right
       (match(expression.right) &&
         matchOther(expression.left) &&
         (extract?.(expression.right, expression.left), true)));

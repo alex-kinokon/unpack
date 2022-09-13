@@ -1,7 +1,7 @@
 import type * as t from "@babel/types";
-import babel, { PluginObj } from "@babel/core";
+import { definePlugin } from "../utils";
 
-export default ({ types: t }: typeof babel): PluginObj => {
+export default definePlugin(({ types: t }) => {
   function ensureBlock<K extends string>(
     obj: {
       [key in K]?: t.Statement | t.Expression | null;
@@ -54,4 +54,4 @@ export default ({ types: t }: typeof babel): PluginObj => {
       },
     },
   };
-};
+});

@@ -1,4 +1,7 @@
+export { default as attachToStringFunction } from "./attach-tostring-function";
 export { default as arrowFunction } from "./arrow-function";
+export { default as quotedProperties } from "./quoted-properties";
+export { default as yodaCondition } from "./yoda-condition";
 export { default as constant } from "./constants";
 export { default as dangerouslyRemoveContextStripping } from "./remove-context-stripping";
 export { default as ensureBlock } from "./ensure-block";

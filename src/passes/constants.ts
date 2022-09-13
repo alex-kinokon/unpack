@@ -1,6 +1,6 @@
-import babel, { PluginObj } from "@babel/core";
+import { definePlugin } from "../utils";
 
-export default ({ types: t }: typeof babel): PluginObj => ({
+export default definePlugin(({ types: t }) => ({
   name: "Constant",
   visitor: {
     UnaryExpression(path) {
@@ -12,4 +12,4 @@ export default ({ types: t }: typeof babel): PluginObj => ({
       }
     },
   },
-});
+}));
