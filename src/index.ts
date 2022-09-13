@@ -1,14 +1,19 @@
 import { parseAsync, transformFromAstAsync } from "@babel/core";
-import { format, Options } from "prettier";
+import type { Options } from "prettier";
+import { format } from "prettier";
 import chalk from "chalk";
 import * as passes from "./passes/index";
 import { getParserPlugins } from "./utils";
 
-type PassOptions = {
+type PluginOptions = {
   [key in keyof typeof passes]?: boolean;
 };
 
-export const defaultOptions: PassOptions = {
+Object.entries(passes).forEach(([key, value]) => {
+  value.setName(key);
+});
+
+export const defaultPluginOptions: PluginOptions = {
   arrowFunction: true,
   constant: true,
   dangerouslyRemoveContextStripping: true,
@@ -27,14 +32,17 @@ export async function convert(
   {
     prettier,
     filename,
-    ...options
-  }: PassOptions & {
+    plugins,
+  }: {
+    plugins?: PluginOptions;
     filename: string;
     prettier?: Options;
   }
 ) {
-  const plugins = Object.entries(passes)
-    .filter(([name]) => (options as any)[name])
+  plugins = { ...defaultPluginOptions, ...plugins };
+
+  const babelPlugins = Object.entries(passes)
+    .filter(([name]) => (plugins as any)[name])
     .map(([, value]) => value);
 
   console.debug(chalk`Parsing AST`);
@@ -52,7 +60,7 @@ export async function convert(
       compact: false,
     },
     cloneInputAst: false,
-    plugins,
+    plugins: babelPlugins,
   });
 
   console.debug(chalk`Running {green prettier}`);

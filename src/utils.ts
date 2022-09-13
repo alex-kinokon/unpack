@@ -1,8 +1,24 @@
 import { extname } from "path";
-import type { PluginObj, ParserOptions } from "@babel/core";
+import type * as Babel from "@babel/core";
+import type { ParserOptions, PluginObj, Visitor } from "@babel/core";
 
-export function definePlugin(plugin: (babel: typeof import("@babel/core")) => PluginObj) {
-  return plugin;
+export function definePlugin(plugin: (babel: typeof Babel) => PluginObj | Visitor<any>) {
+  let pluginName = "";
+
+  function pluginFn(babel: typeof Babel): PluginObj {
+    let pluginValue = plugin(babel);
+    if (!("visitor" in pluginValue)) {
+      pluginValue = { visitor: pluginValue };
+    }
+
+    return { ...pluginValue, name: pluginName ?? pluginValue.name };
+  }
+
+  pluginFn.setName = (name: string) => {
+    pluginName = name;
+  };
+
+  return pluginFn;
 }
 
 type ParserPlugin = NonNullable<ParserOptions["plugins"]>[number];
