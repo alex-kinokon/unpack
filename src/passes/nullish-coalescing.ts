@@ -73,7 +73,17 @@ export const nullishCoalescing = definePlugin(({ types: t }) => {
           },
         });
         if (found) {
-          path.replaceWith(obj);
+          if (t.isCallExpression(obj.node)) {
+            path.replaceWith(
+              t.optionalCallExpression(
+                obj.node.callee as t.Expression,
+                obj.node.arguments,
+                obj.node.optional || false
+              )
+            );
+          } else {
+            path.replaceWith(obj);
+          }
         }
       }
 
@@ -137,7 +147,26 @@ export const nullishCoalescing = definePlugin(({ types: t }) => {
           },
         });
         if (found) {
-          path.replaceWith(alternate);
+          if (t.isMemberExpression(alternate)) {
+            path.replaceWith(
+              t.optionalMemberExpression(
+                alternate.object,
+                alternate.property as t.Expression,
+                alternate.computed,
+                true
+              )
+            );
+          } else if (t.isCallExpression(alternate)) {
+            path.replaceWith(
+              t.optionalCallExpression(
+                alternate.callee as t.Expression,
+                alternate.arguments,
+                alternate.optional || false
+              )
+            );
+          } else {
+            path.replaceWith(alternate);
+          }
         }
       }
     },
