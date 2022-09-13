@@ -1,19 +1,16 @@
-import babel, { PluginObj } from "@babel/core";
+import { definePlugin } from "../utils";
 
-export default ({ types: t }: typeof babel): PluginObj => ({
-  name: "SplitVariableDeclarator",
-  visitor: {
-    VariableDeclaration(path) {
-      const { node } = path;
-      if (path.parent.type === "ForStatement") {
-        return;
-      }
+export const splitVariableDeclarator = definePlugin(({ types: t }) => ({
+  VariableDeclaration(path) {
+    const { node } = path;
+    if (path.parent.type === "ForStatement") {
+      return;
+    }
 
-      if (node.declarations.length > 1) {
-        path.replaceWithMultiple(
-          node.declarations.map(dec => t.variableDeclaration(node.kind, [dec]))
-        );
-      }
-    },
+    if (node.declarations.length > 1) {
+      path.replaceWithMultiple(
+        node.declarations.map(dec => t.variableDeclaration(node.kind, [dec]))
+      );
+    }
   },
-});
+}));

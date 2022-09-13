@@ -8,8 +8,8 @@
     "build:cli": "TASK_NAME=cli rollup -c"
   },
   "dependencies": {
-    "@babel/core": "^7.18.9",
-    "@babel/preset-env": "^7.18.9",
+    "@babel/core": "^7.19.0",
+    "@babel/preset-env": "^7.19.0",
     "chalk": "^4.1.2",
     "commander": "^9.4.0",
     "lodash": "^4.17.21",
@@ -19,17 +19,25 @@
     "lib"
   ],
   "devDependencies": {
-    "@babel/parser": "^7.18.9",
-    "@babel/types": "^7.18.9",
-    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@babel/parser": "^7.19.0",
+    "@babel/types": "^7.19.0",
+    "@rollup/plugin-node-resolve": "^14.1.0",
     "@types/babel__core": "^7.1.19",
-    "@types/lodash": "^4.14.182",
-    "@types/node": "^18.0.6",
-    "@types/prettier": "^2.6.3",
-    "rollup": "^2.77.0",
+    "@types/lodash": "^4.14.185",
+    "@types/node": "^18.7.17",
+    "@types/prettier": "^2.7.0",
+    "esbuild": "^0.15.7",
+    "esbuild-register": "^3.3.3",
+    "rollup": "^2.79.0",
     "rollup-plugin-ts": "^3.0.2",
     "ts-node": "^10.9.1",
-    "typescript": "4.7.4"
+    "typescript": "4.8.3",
+    "@typescript-eslint/eslint-plugin": "5.37.0",
+    "@typescript-eslint/parser": "5.37.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-import-resolver-typescript": "3.5.1",
+    "eslint-plugin-import": "2.26.0",
+    "eslint": "8.23.1"
   },
   "resolutions": {
     "@babel/types": "7.18.9"

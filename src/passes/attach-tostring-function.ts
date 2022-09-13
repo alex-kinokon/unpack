@@ -2,7 +2,7 @@ import type { NodePath } from "@babel/core";
 import type { Node } from "@babel/types";
 import { definePlugin } from "../utils";
 
-export default definePlugin(({ types: t }) => {
+export const attachToStringFunction = definePlugin(({ types: t }) => {
   const $id = t.identifier;
 
   const getAssigner = () => {
@@ -29,51 +29,48 @@ export default definePlugin(({ types: t }) => {
   };
 
   return {
-    name: "AttachToStringFunction",
-    visitor: {
-      Program(path) {
-        const program = path.node;
+    Program(path) {
+      const program = path.node;
 
-        const assignerId = path.scope.generateUidIdentifier("assignToString");
-        const [assigner, toStringNode] = getAssigner();
+      const assignerId = path.scope.generateUidIdentifier("assignToString");
+      const [assigner, toStringNode] = getAssigner();
+      program.body.unshift(
+        t.variableDeclaration("const", [t.variableDeclarator(assignerId, assigner)])
+      );
+
+      const attached = new WeakSet<Node>();
+      attached.add(assigner);
+      attached.add(toStringNode);
+
+      function assignSource(path: NodePath<any>) {
+        if (attached.has(path.node)) {
+          return;
+        }
+        attached.add(path.node);
+
+        const stringId = path.scope.generateUidIdentifier();
         program.body.unshift(
-          t.variableDeclaration("const", [t.variableDeclarator(assignerId, assigner)])
+          t.variableDeclaration("const", [
+            t.variableDeclarator(stringId, t.stringLiteral(path.getSource())),
+          ])
         );
 
-        const attached = new WeakSet<Node>();
-        attached.add(assigner);
-        attached.add(toStringNode);
+        path.replaceWith(
+          t.callExpression(t.cloneNode(assignerId), [path.node, t.cloneNode(stringId)])
+        );
+      }
 
-        function assignSource(path: NodePath<any>) {
-          if (attached.has(path.node)) {
-            return;
-          }
-          attached.add(path.node);
-
-          const stringId = path.scope.generateUidIdentifier();
-          program.body.unshift(
-            t.variableDeclaration("const", [
-              t.variableDeclarator(stringId, t.stringLiteral(path.getSource())),
-            ])
-          );
-
-          path.replaceWith(
-            t.callExpression(t.cloneNode(assignerId), [path.node, t.cloneNode(stringId)])
-          );
-        }
-
-        path.traverse({
-          FunctionDeclaration(path) {
-            assignSource(path);
-          },
-          FunctionExpression(path) {
-            assignSource(path);
-          },
-          ArrowFunctionExpression(path) {
-            assignSource(path);
-          },
-        });
-      },
+      path.traverse({
+        FunctionDeclaration(path) {
+          assignSource(path);
+        },
+        FunctionExpression(path) {
+          assignSource(path);
+        },
+        ArrowFunctionExpression(path) {
+          assignSource(path);
+        },
+      });
     },
   };
 });

@@ -1,32 +1,25 @@
 import fs from "fs";
 import { program } from "commander";
 import { kebabCase } from "lodash";
-import { convert, defaultOptions } from "./index";
+import { convert, defaultPasses } from "./index";
 
 const command = program
   .option("-i, --input <input>", "Input file path")
   .option("-o, --output <output>", "Output file path");
 
-const defaultOptionsKeys = Object.keys(defaultOptions) as (keyof typeof defaultOptions)[];
+const defaultOptionsKeys = Object.keys(defaultPasses) as (keyof typeof defaultPasses)[];
 
 defaultOptionsKeys.forEach(key => {
-  command.option(`--${kebabCase(key)}`, `Enable ${key}`, defaultOptions[key] as boolean);
+  command.option(`--${kebabCase(key)}`, `Enable ${key}`, defaultPasses[key] as boolean);
 });
 
 command.parse();
 
 const opts = program.opts();
-
 const file = fs.readFileSync(opts.input, "utf-8");
 
-const options = {
-  ...defaultOptions,
+convert(file, {
   filename: opts.input,
-};
-defaultOptionsKeys.forEach(key => {
-  options[key] = opts[key];
-});
-
-convert(file, options).then(res => {
+}).then(res => {
   fs.writeFileSync(opts.output, res);
 });
