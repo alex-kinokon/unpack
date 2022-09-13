@@ -34,12 +34,13 @@ interface ConvertOptions {
   features?: FeatureOptions;
   filename: string;
   prettier?: Options;
+  silent?: boolean;
   plugins?: ((Babel: typeof babel) => babel.PluginObj<babel.PluginPass>)[];
 }
 
 export async function convert(
   src: string,
-  { prettier, filename, features, plugins }: ConvertOptions
+  { prettier, filename, features, plugins, silent }: ConvertOptions
 ) {
   features = { ...defaultPluginOptions, ...features };
 
@@ -48,7 +49,9 @@ export async function convert(
     .map(([, value]) => value as babel.PluginItem)
     .concat(plugins ?? []);
 
-  console.debug(chalk`Parsing AST`);
+  if (!silent) {
+    console.debug(chalk`Parsing AST`);
+  }
 
   const ast = await babel.parseAsync(src, {
     babelrc: false,
@@ -57,7 +60,10 @@ export async function convert(
     },
   });
 
-  console.debug(chalk`Running {green Babel transforms}`);
+  if (!silent) {
+    console.debug(chalk`Running {green Babel transforms}`);
+  }
+
   const result = await babel.transformFromAstAsync(ast!, src, {
     ast: true,
     generatorOpts: { compact: false },
@@ -65,7 +71,10 @@ export async function convert(
     plugins: babelPlugins,
   });
 
-  console.debug(chalk`Running {green prettier}`);
+  if (!silent) {
+    console.debug(chalk`Running {green prettier}`);
+  }
+
   const code = format(result!.code!, {
     semi: true,
     arrowParens: "avoid",
